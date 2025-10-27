@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "tekoha",
+  "version": "${version}",
+  "name": "Tekoha Additions",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tekoha/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "fabric-datagen": [
+      "dev.arzcbnh.minecraft.client.TekohaAdditionsDataGenerator"
+    ],
+    "main": [
+      "dev.arzcbnh.minecraft.TekohaAdditions"
+    ]
+  },
+  "mixins": [
+    "tekoha.mixins.json",
+    {
+      "config": "tekoha.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

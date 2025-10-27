@@ -1,0 +1,8 @@
+{
+  "dialog.tekoha.auth.title": "Authentication Form",
+  "dialog.tekoha.auth.signup": "Your account doesn't have a registered password. Create a new password to continue. If left blank, no password will be required, but your account will be vulnerable.",
+  "dialog.tekoha.auth.login": "Type in your password to continue.",
+  "dialog.tekoha.auth.fail": "Wrong password. If you need help, talk to an administrator.",
+  "dialog.tekoha.auth.input.password": "Password",
+  "dialog.tekoha.auth.button.confirm": "Confirm"
+}

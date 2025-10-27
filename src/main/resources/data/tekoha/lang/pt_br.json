@@ -1,0 +1,8 @@
+{
+  "dialog.tekoha.auth.title": "Formulário de Autenticação",
+  "dialog.tekoha.auth.signup": "Não encontramos uma senha cadastrada para sua conta. Crie uma nova senha para continuar. Se deixado em branco, não será exigido senha, porém sua conta ficará vulnerável",
+  "dialog.tekoha.auth.login": "Digite sua senha para continuar.",
+  "dialog.tekoha.auth.fail": "Senha incorreta. Caso precise de ajuda, entre em contato com um administrador.",
+  "dialog.tekoha.auth.input.password": "Senha",
+  "dialog.tekoha.auth.button.confirm": "Confirmar"
+}

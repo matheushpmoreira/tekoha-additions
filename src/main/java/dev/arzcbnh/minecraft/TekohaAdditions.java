@@ -1,16 +1,16 @@
 package dev.arzcbnh.minecraft;
 
-import dev.arzcbnh.minecraft.auth.AuthHandler;
+import dev.arzcbnh.minecraft.auth.AuthService;
+import dev.arzcbnh.minecraft.auth.LoginRequestCallback;
+import dev.arzcbnh.minecraft.auth.PropertiesPasswordDatabase;
 import dev.arzcbnh.minecraft.util.ModConfig;
+import dev.arzcbnh.minecraft.util.RegistryDialogProvider;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.core.registries.Registries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 
 public class TekohaAdditions implements ModInitializer {
     public static final String MOD_ID = "tekoha";
@@ -18,7 +18,6 @@ public class TekohaAdditions implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
 //
 //        if (!MOD_DATA_PATH.toFile().exists()) {
 //            MOD_DATA_PATH.toFile().mkdirs();
@@ -32,16 +31,25 @@ public class TekohaAdditions implements ModInitializer {
 //            }
 //        }
 
+//        System.out.println("I'm initialized somehow");
         // create data dir
-        try {
-            Files.createDirectory(ModConfig.getInstance().modDataPath);
-        } catch (FileAlreadyExistsException e) {
-            // Ignore
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create data directory", e);
-        }
+//        try {
+//            Files.createDirectory(ModConfig.getInstance().modDataPath);
+//        } catch (FileAlreadyExistsException e) {
+//            // Ignore
+//        } catch (IOException e) {
+//            throw new RuntimeException("Could not create data directory", e);
+//        }
 
-        ServerPlayerEvents.JOIN.register(AuthHandler::begin);
-        ServerPlayerEvents.LEAVE.register(AuthHandler::cancel);
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            final var database = new PropertiesPasswordDatabase();
+            final var provider = new RegistryDialogProvider(server.registryAccess().lookupOrThrow(Registries.DIALOG));
+            final var service = new AuthService(database, provider, ModConfig.load());
+
+            ServerPlayerEvents.JOIN.register(service::onJoin);
+            ServerPlayerEvents.LEAVE.register(service::onLeave);
+            LoginRequestCallback.EVENT.register(service::onRequest);
+        });
+
     }
 }

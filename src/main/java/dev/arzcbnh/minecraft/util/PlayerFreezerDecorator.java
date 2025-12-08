@@ -1,16 +1,16 @@
 package dev.arzcbnh.minecraft.util;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.GameMode;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 
 public class PlayerFreezerDecorator {
-    public final ServerPlayerEntity player;
+    public final ServerPlayer player;
 
     private boolean isFrozen;
     private float movementSpeed;
-    private GameMode gamemode;
+    private GameType gamemode;
 
-    public PlayerFreezerDecorator(ServerPlayerEntity player) {
+    public PlayerFreezerDecorator(ServerPlayer player) {
         this.player = player;
     }
 
@@ -19,11 +19,11 @@ public class PlayerFreezerDecorator {
             return;
         }
 
-        this.movementSpeed = this.player.getMovementSpeed();
-        this.gamemode = this.player.getGameMode();
+        this.movementSpeed = this.player.getSpeed();
+        this.gamemode = this.player.gameMode();
 
         this.isFrozen = true;
-        player.setMovementSpeed(0.0F);
+        player.setSpeed(0.0F);
 //        player.changeGameMode(GameMode.SPECTATOR);
     }
 
@@ -34,6 +34,6 @@ public class PlayerFreezerDecorator {
 
         this.isFrozen = false;
 //        player.setMovementSpeed(this.movementSpeed);
-        player.changeGameMode(this.gamemode);
+        player.setGameMode(this.gamemode);
     }
 }

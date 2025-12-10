@@ -1,8 +1,16 @@
 {
-  "dialog.tekoha.auth.title": "Formulário de Autenticação",
-  "dialog.tekoha.auth.signup": "Não encontramos uma senha cadastrada para sua conta. Crie uma nova senha para continuar. Se deixado em branco, não será exigido senha, porém sua conta ficará vulnerável",
-  "dialog.tekoha.auth.login": "Digite sua senha para continuar.",
-  "dialog.tekoha.auth.fail": "Senha incorreta. Caso precise de ajuda, entre em contato com um administrador.",
-  "dialog.tekoha.auth.input.password": "Senha",
-  "dialog.tekoha.auth.button.confirm": "Confirmar"
+  "tekoha.auth.chat.conflict": "Usuário já cadastrado. Utilize %s para autenticar-se.",
+  "tekoha.auth.chat.invalid": "A senha deve possuir entre 6 e 64 caracteres. Tente novamente.",
+  "tekoha.auth.chat.login": "Utilize %s para autenticar-se.",
+  "tekoha.auth.chat.missing": "Usuário não encontrado. Utilize %s para cadastrar-se.",
+  "tekoha.auth.chat.signup": "Utilize %s para cadastrar-se.",
+  "tekoha.auth.chat.success": "Autenticação realizada com sucesso!",
+  "tekoha.auth.chat.wrong": "Senha incorreta. Caso precise de ajuda, contate um administrador.",
+
+  "tekoha.auth.dialog.title": "Formulário de Autenticação",
+  "tekoha.auth.dialog.signup": "Usuário não encontrado. Crie uma nova senha para continuar.",
+  "tekoha.auth.dialog.login": "Digite sua senha para continuar.",
+  "tekoha.auth.dialog.fail": "Senha incorreta. Caso precise de ajuda, contate um administrador.",
+  "tekoha.auth.dialog.input.password": "Senha",
+  "tekoha.auth.dialog.button.confirm": "Confirmar"
 }

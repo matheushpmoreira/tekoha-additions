@@ -1,76 +1,71 @@
 package dev.arzcbnh.minecraft.auth;
 
 import dev.arzcbnh.minecraft.TekohaAdditions;
-import dev.arzcbnh.minecraft.util.DialogProvider;
-import dev.arzcbnh.minecraft.util.ModConfig;
-import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.common.ClientboundClearDialogPacket;
-import net.minecraft.server.dialog.Dialog;
+import dev.arzcbnh.minecraft.data.PlayerData;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.OutgoingChatMessage;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+/**
+ * Handles the authentication of players.
+ */
+public interface AuthService {
+    /**
+     * Puts a player in the authentication state. The player is forbidden from interacting with the server (breaking,
+     * moving, running commands, etc.) in any way but for authenticating.
+     */
+    default void enterAuthState(ServerPlayer player) {
+        final var data = PlayerData.of(player);
 
-public class AuthService {
-    private final Map<ServerPlayer, AuthProcess> ongoing = new ConcurrentHashMap<>();
-    private final PropertiesPasswordDatabase database;
-    private final ModConfig config;
-
-    private final Holder<Dialog> FAIL_DIALOG;
-    private final Holder<Dialog> INVALID_DIALOG;
-    private final Holder<Dialog> LOGIN_DIALOG;
-    private final Holder<Dialog> SIGNUP_DIALOG;
-
-    public AuthService(PropertiesPasswordDatabase database, DialogProvider provider, ModConfig config) {
-        this.database = database;
-        this.config = config;
-
-        this.FAIL_DIALOG = Holder.direct(provider.get(String.format("%s:login/fail", TekohaAdditions.MOD_ID)));
-        this.INVALID_DIALOG = Holder.direct(provider.get(String.format("%s:login/invalid", TekohaAdditions.MOD_ID)));
-        this.LOGIN_DIALOG = Holder.direct(provider.get(String.format("%s:login/login", TekohaAdditions.MOD_ID)));
-        this.SIGNUP_DIALOG = Holder.direct(provider.get(String.format("%s:login/signup", TekohaAdditions.MOD_ID)));
-    }
-
-    public void onJoin(ServerPlayer player) {
-        if (ongoing.containsKey(player)) {
-            return;
+        if (data.getDefaultGameType().isEmpty()) {
+            TekohaAdditions.LOGGER.info("No game type found, storing {}", player.gameMode());
+            data.setDefaultGameType(player.gameMode());
         }
 
-        final var proc = new AuthProcess(player, player.gameMode(), database.retrieve(player.getUUID()).orElse(null));
-        player.openDialog(proc.data() == null ? SIGNUP_DIALOG : LOGIN_DIALOG);
-        ongoing.put(player, proc);
+        // FIXME: I know this doesn't prevent all player interactions, but it's enough for now.
+        player.setGameMode(GameType.SPECTATOR);
     }
 
-    public void onLeave(ServerPlayer player) {
-        if (!ongoing.containsKey(player)) {
-            return;
-        }
-
-        final var gamemode = ongoing.remove(player).gamemode();
-        player.setGameMode(gamemode);
+    /**
+     * Removes the player from the authentication state. It should normally be called after the player is successfully authenticated. Does nothing if the player is not in the authentication state.
+     */
+    default void exitAuthState(ServerPlayer player) {
+        final var data =  PlayerData.of(player);
+        data.getDefaultGameType().ifPresent(player::setGameMode);
+        data.setDefaultGameType(null);
     }
 
-    public void onRequest(ServerPlayer player, String password) {
-        if (!ongoing.containsKey(player)) {
-            return;
-        }
+    /**
+     * Handles a login request, namely whether to complete the authentication process given the credentials. May still respond in other ways to the request, such as showing the result on chat.
+     */
+    void handleLoginRequest(ServerPlayer player, String password);
 
-        final var data = ongoing.get(player).data();
+    /**
+     * Handles a signup request.
+     */
+    void handleSignupRequest(ServerPlayer player, String password);
 
-        if (password.isBlank() || password.length() > 64) {
-            player.openDialog(INVALID_DIALOG);
-        } else if (data == null) {
-            database.store(PasswordData.fromPassword(player.getUUID(), password, config));
-            onSuccess(player);
-        } else if (data.satisfies(password)){
-            onSuccess(player);
-        } else {
-            player.openDialog(FAIL_DIALOG);
-        }
-    }
+    /**
+     * Handles a password change request.
+     */
+    void handlePasswordChangeRequest(ServerPlayer player, String oldPassword, String newPassword);
 
-    private void onSuccess(ServerPlayer player) {
-        player.connection.send(ClientboundClearDialogPacket.INSTANCE);
-        player.setGameMode(ongoing.remove(player).gamemode());
+    /**
+     * Handles a delete request.
+     */
+    void handleDeleteRequest(ServerPlayer player, String password);
+
+    /**
+     * Initializes the service.
+     */
+    default void init() {
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            ServerPlayerEvents.JOIN.register(this::enterAuthState);
+        });
     }
 }

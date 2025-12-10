@@ -1,8 +1,16 @@
 {
-  "dialog.tekoha.auth.title": "Authentication Form",
-  "dialog.tekoha.auth.signup": "Your account doesn't have a registered password. Create a new password to continue. If left blank, no password will be required, but your account will be vulnerable.",
-  "dialog.tekoha.auth.login": "Type in your password to continue.",
-  "dialog.tekoha.auth.fail": "Wrong password. If you need help, talk to an administrator.",
-  "dialog.tekoha.auth.input.password": "Password",
-  "dialog.tekoha.auth.button.confirm": "Confirm"
+  "tekoha.auth.chat.conflict": "User already registered. Use %s to authenticate.",
+  "tekoha.auth.chat.invalid": "The password must be between 6 and 64 characters long. Try again.",
+  "tekoha.auth.chat.login": "Use %s to authenticate.",
+  "tekoha.auth.chat.missing": "User not found. Use %s to register.",
+  "tekoha.auth.chat.signup": "Use %s to register.",
+  "tekoha.auth.chat.success": "Authentication successful!",
+  "tekoha.auth.chat.wrong": "Wrong password. If you need help, contact an administrator.",
+
+  "tekoha.auth.dialog.title": "Authentication Form",
+  "tekoha.auth.dialog.signup": "User not found. Create a new password to continue.",
+  "tekoha.auth.dialog.login": "Type in your password to continue.",
+  "tekoha.auth.dialog.fail": "Wrong password. If you need help, contact an administrator.",
+  "tekoha.auth.dialog.input.password": "Password",
+  "tekoha.auth.dialog.button.confirm": "Confirm"
 }

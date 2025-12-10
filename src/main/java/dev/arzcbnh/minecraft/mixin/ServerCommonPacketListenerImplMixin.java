@@ -2,21 +2,16 @@ package dev.arzcbnh.minecraft.mixin;
 
 import dev.arzcbnh.minecraft.TekohaAdditions;
 //import dev.arzcbnh.minecraft.auth.AuthHandler;
-import dev.arzcbnh.minecraft.auth.AuthService;
-import dev.arzcbnh.minecraft.auth.LoginRequestCallback;
-import net.minecraft.nbt.CompoundTag;
+import dev.arzcbnh.minecraft.auth.AuthFormDialog;
+import dev.arzcbnh.minecraft.auth.AuthRequestCallback;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.common.ServerboundCustomClickActionPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Mixin(ServerCommonPacketListenerImpl.class)
 public abstract class ServerCommonPacketListenerImplMixin {
@@ -32,8 +27,14 @@ public abstract class ServerCommonPacketListenerImplMixin {
             }
 
             switch (id.getPath()) {
-                case "login_request":
-                    LoginRequestCallback.EVENT.invoker().offer(player, payload.get().asCompound().get().getStringOr("password", ""));
+                case "auth/login": {
+                    AuthRequestCallback.LOGIN.invoker().offer(player, payload.flatMap(Tag::asCompound).flatMap(tag -> tag.getString("password")).orElse(""));
+                    break;
+                }
+                case "auth/signup": {
+                    AuthRequestCallback.SIGNUP.invoker().offer(player, payload.flatMap(Tag::asCompound).flatMap(tag -> tag.getString("password")).orElse(""));
+                    break;
+                }
             }
         }
     }

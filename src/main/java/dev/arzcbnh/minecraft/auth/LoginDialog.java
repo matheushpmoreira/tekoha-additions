@@ -3,7 +3,6 @@ package dev.arzcbnh.minecraft.auth;
 import dev.arzcbnh.minecraft.TekohaAdditions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dialog.*;
 import net.minecraft.server.dialog.action.CustomAll;
 import net.minecraft.server.dialog.body.DialogBody;

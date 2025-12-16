@@ -37,8 +37,8 @@ public class ChatAuthService implements AuthService {
         if (command == null) {
             return Component.translatable("tekoha.auth.chat." + translationKey).withColor(CommonColors.GRAY);
         } else {
-            final var clickEvent = new ClickEvent.SuggestCommand(command + " ");
-            final var insert = Component.literal(command)
+            final var clickEvent = new ClickEvent.SuggestCommand("/" + command + " ");
+            final var insert = Component.literal("/" + command)
                     .withColor(CommonColors.WHITE)
                     .withStyle(Style.EMPTY.withUnderlined(true).withClickEvent(clickEvent));
 

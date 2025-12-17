@@ -1,9 +1,9 @@
-package dev.arzcbnh.minecraft.auth;
+package dev.arzcbnh.tekoha.auth;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.arzcbnh.minecraft.TekohaAdditions;
-import dev.arzcbnh.minecraft.util.ModConfig;
+import dev.arzcbnh.tekoha.TekohaAdditions;
+import dev.arzcbnh.tekoha.util.ModConfig;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

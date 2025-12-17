@@ -1,9 +1,8 @@
-package dev.arzcbnh.minecraft.mixin;
+package dev.arzcbnh.tekoha.mixin;
 
-import dev.arzcbnh.minecraft.TekohaAdditions;
+import dev.arzcbnh.tekoha.TekohaAdditions;
 //import dev.arzcbnh.minecraft.auth.AuthHandler;
-import dev.arzcbnh.minecraft.auth.AuthFormDialog;
-import dev.arzcbnh.minecraft.auth.AuthRequestCallback;
+import dev.arzcbnh.tekoha.auth.AuthRequestCallback;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.common.ServerboundCustomClickActionPacket;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;

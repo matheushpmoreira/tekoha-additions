@@ -1,11 +1,12 @@
 {
   "tekoha.auth.chat.conflict": "User already registered. Use %s to authenticate.",
-  "tekoha.auth.chat.invalid": "The password must be between 6 and 64 characters long. Try again.",
-  "tekoha.auth.chat.login": "Use %s to authenticate.",
-  "tekoha.auth.chat.missing": "User not found. Use %s to register.",
-  "tekoha.auth.chat.signup": "Use %s to register.",
+  "tekoha.auth.chat.delete": "Password deleted. Use %s to register again.",
+  "tekoha.auth.chat.notfound": "User not found. Use %s to register.",
   "tekoha.auth.chat.success": "Authentication successful!",
-  "tekoha.auth.chat.wrong": "Wrong password. If you need help, contact an administrator.",
+  "tekoha.auth.chat.unauthorized": "Wrong password. If you need help, contact an administrator.",
+  "tekoha.auth.chat.unprocessable": "The password must be between 6 and 64 characters long.",
+  "tekoha.auth.chat.update": "Password updated successfully!",
+  "tekoha.auth.chat.welcome": "Use %s to authenticate, or %s to register.",
 
   "tekoha.auth.dialog.title": "Authentication Form",
   "tekoha.auth.dialog.signup": "User not found. Create a new password to continue.",

@@ -1,4 +1,4 @@
-package dev.arzcbnh.minecraft.auth;
+package dev.arzcbnh.tekoha.auth;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

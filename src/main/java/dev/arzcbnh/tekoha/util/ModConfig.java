@@ -1,14 +1,11 @@
-package dev.arzcbnh.minecraft.util;
+package dev.arzcbnh.tekoha.util;
 
-import dev.arzcbnh.minecraft.TekohaAdditions;
+import dev.arzcbnh.tekoha.TekohaAdditions;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.Properties;
 
 public class ModConfig {

@@ -1,16 +1,4 @@
-package dev.arzcbnh.minecraft.auth;
-
-import dev.arzcbnh.minecraft.TekohaAdditions;
-import dev.arzcbnh.minecraft.util.ModConfig;
-import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.common.ClientboundClearDialogPacket;
-import net.minecraft.server.dialog.Dialog;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameType;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+package dev.arzcbnh.tekoha.auth;
 
 //import static dev.arzcbnh.minecraft.auth.AuthFormDialog.InputError.*;
 //import static dev.arzcbnh.minecraft.auth.AuthFormDialog.Type.*;

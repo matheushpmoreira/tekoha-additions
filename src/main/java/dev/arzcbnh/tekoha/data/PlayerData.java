@@ -1,16 +1,14 @@
-package dev.arzcbnh.minecraft.data;
+package dev.arzcbnh.tekoha.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.arzcbnh.minecraft.TekohaAdditions;
-import dev.arzcbnh.minecraft.auth.PasswordEntry;
-import net.minecraft.core.UUIDUtil;
+import dev.arzcbnh.tekoha.TekohaAdditions;
+import dev.arzcbnh.tekoha.auth.PasswordEntry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -59,5 +57,9 @@ public class PlayerData extends SavedData {
     public void setDefaultGameType(@Nullable GameType defaultGameType) {
         this.defaultGameType = defaultGameType;
         this.setDirty();
+    }
+
+    public boolean isAuthenticated() {
+        return this.defaultGameType == null;
     }
 }

@@ -11,10 +11,10 @@
   "environment": "server",
   "entrypoints": {
     "fabric-datagen": [
-      "dev.arzcbnh.minecraft.client.TekohaAdditionsDataGenerator"
+      "dev.arzcbnh.tekoha.client.TekohaAdditionsDataGenerator"
     ],
     "main": [
-      "dev.arzcbnh.minecraft.TekohaAdditions"
+      "dev.arzcbnh.tekoha.TekohaAdditions"
     ]
   },
   "mixins": [

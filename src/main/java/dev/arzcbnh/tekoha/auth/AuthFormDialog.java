@@ -1,24 +1,4 @@
-package dev.arzcbnh.minecraft.auth;
-
-import dev.arzcbnh.minecraft.TekohaAdditions;
-
-import java.util.List;
-import java.util.Optional;
-
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.dialog.ActionButton;
-import net.minecraft.server.dialog.CommonButtonData;
-import net.minecraft.server.dialog.CommonDialogData;
-import net.minecraft.server.dialog.Dialog;
-import net.minecraft.server.dialog.DialogAction;
-import net.minecraft.server.dialog.Input;
-import net.minecraft.server.dialog.NoticeDialog;
-import net.minecraft.server.dialog.action.CustomAll;
-import net.minecraft.server.dialog.body.DialogBody;
-import net.minecraft.server.dialog.body.PlainMessage;
-import net.minecraft.server.dialog.input.TextInput;
-import net.minecraft.util.CommonColors;
+package dev.arzcbnh.tekoha.auth;
 
 public class AuthFormDialog {
 //    public static final String LOGIN_PATH = "auth/login";

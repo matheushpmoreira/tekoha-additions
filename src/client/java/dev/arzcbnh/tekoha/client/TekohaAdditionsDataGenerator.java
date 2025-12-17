@@ -1,4 +1,4 @@
-package dev.arzcbnh.minecraft.client;
+package dev.arzcbnh.tekoha.client;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;

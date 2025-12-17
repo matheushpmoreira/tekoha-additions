@@ -1,12 +1,11 @@
 package dev.arzcbnh.tekoha.util;
 
 import dev.arzcbnh.tekoha.TekohaAdditions;
-import net.fabricmc.loader.api.FabricLoader;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Properties;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class ModConfig {
     public final String passwordHashAlgorithm;
@@ -26,18 +25,18 @@ public class ModConfig {
     }
 
     public static ModConfig load() {
-//        final var filename = TekohaAdditions.MOD_ID + ".properties";
+        //        final var filename = TekohaAdditions.MOD_ID + ".properties";
         final var path = FabricLoader.getInstance().getConfigDir().resolve(TekohaAdditions.MOD_ID + ".properties");
-//        final var file = path.toFile();
+        //        final var file = path.toFile();
         final var props = new Properties();
 
-//        if (!file.exists()) {
-//            try (final var in = TekohaAdditions.class.getResourceAsStream("/tekoha.properties")) {
-//                Files.copy(Objects.requireNonNull(in), path, StandardCopyOption.REPLACE_EXISTING);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
+        //        if (!file.exists()) {
+        //            try (final var in = TekohaAdditions.class.getResourceAsStream("/tekoha.properties")) {
+        //                Files.copy(Objects.requireNonNull(in), path, StandardCopyOption.REPLACE_EXISTING);
+        //            } catch (IOException e) {
+        //                throw new RuntimeException(e);
+        //            }
+        //        }
 
         try (final var in = Files.newInputStream(path)) {
             props.load(in);

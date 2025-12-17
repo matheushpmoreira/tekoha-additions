@@ -3,6 +3,8 @@ package dev.arzcbnh.tekoha.auth;
 import dev.arzcbnh.tekoha.TekohaAdditions;
 import dev.arzcbnh.tekoha.data.PlayerData;
 import io.netty.buffer.Unpooled;
+import java.util.Arrays;
+import java.util.UUID;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,9 +19,6 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Arrays;
-import java.util.UUID;
 
 public class ChatAuthService implements AuthService {
     @Override
@@ -39,8 +38,23 @@ public class ChatAuthService implements AuthService {
         // array length, and the passengers ID, of which there's always one. I picked a chicken because a player keeps
         // the same eye level when mounting it, but unfortunately I wasn't able to make it invisible, nor able to hide
         // the "vehicle hearts". That must do for now.
-        player.connection.send(new ClientboundAddEntityPacket(-1, UUID.randomUUID(), player.getX(), player.getY(), player.getZ(), player.getXRot(), player.getYRot(), EntityType.CHICKEN, 0, Vec3.ZERO, player.getYHeadRot()));
-        player.connection.send(ClientboundSetPassengersPacket.STREAM_CODEC.decode(new FriendlyByteBuf(Unpooled.buffer(12)).writeVarInt(-1).writeVarInt(1).writeVarInt(player.getId())));
+        player.connection.send(new ClientboundAddEntityPacket(
+                -1,
+                UUID.randomUUID(),
+                player.getX(),
+                player.getY(),
+                player.getZ(),
+                player.getXRot(),
+                player.getYRot(),
+                EntityType.CHICKEN,
+                0,
+                Vec3.ZERO,
+                player.getYHeadRot()));
+        player.connection.send(
+                ClientboundSetPassengersPacket.STREAM_CODEC.decode(new FriendlyByteBuf(Unpooled.buffer(12))
+                        .writeVarInt(-1)
+                        .writeVarInt(1)
+                        .writeVarInt(player.getId())));
         ChatMessage.Welcome.sendTo(player);
 
         return 1;
@@ -48,7 +62,7 @@ public class ChatAuthService implements AuthService {
 
     @Override
     public int endAuth(ServerPlayer player) {
-        final var data =  PlayerData.of(player);
+        final var data = PlayerData.of(player);
         data.getDefaultGameType().ifPresent(player::setGameMode);
         data.setDefaultGameType(null);
 
@@ -129,8 +143,8 @@ public class ChatAuthService implements AuthService {
     }
 
     public boolean isPasswordInvalid(String password) {
-        return TekohaAdditions.CONFIG.passwordMinLength > password.length() ||
-                password.length() > TekohaAdditions.CONFIG.passwordMaxLength;
+        return TekohaAdditions.CONFIG.passwordMinLength > password.length()
+                || password.length() > TekohaAdditions.CONFIG.passwordMaxLength;
     }
 
     public void init() {
@@ -150,11 +164,16 @@ public class ChatAuthService implements AuthService {
         private final Component component;
 
         ChatMessage(String key, String... insert) {
-            final var slots = Arrays.stream(insert).map(text -> Component.literal(text)
-                    .withStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent.SuggestCommand(text + " ")))
-                    .withColor(CommonColors.WHITE)).toArray();
+            final var slots = Arrays.stream(insert)
+                    .map(text -> Component.literal(text)
+                            .withStyle(Style.EMPTY
+                                    .withUnderlined(true)
+                                    .withClickEvent(new ClickEvent.SuggestCommand(text + " "))
+                            .withColor(CommonColors.WHITE)))
+                    .toArray();
 
-            this.component = Component.translatable("tekoha.auth.chat." + key, slots).withColor(CommonColors.GRAY);
+            this.component =
+                    Component.translatable("tekoha.auth.chat." + key, slots).withColor(CommonColors.GRAY);
         }
 
         public void sendTo(ServerPlayer player) {

@@ -4,21 +4,21 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.arzcbnh.tekoha.TekohaAdditions;
 import dev.arzcbnh.tekoha.util.ModConfig;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.*;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 public record PasswordEntry(byte[] hash, byte[] salt, int iterations, String algorithm) {
-    public static final Codec<byte[]> BYTE_ARR_CODEC = Codec.STRING.xmap(Base64.getDecoder()::decode, Base64.getEncoder()::encodeToString);
+    public static final Codec<byte[]> BYTE_ARR_CODEC =
+            Codec.STRING.xmap(Base64.getDecoder()::decode, Base64.getEncoder()::encodeToString);
     public static final Codec<PasswordEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            BYTE_ARR_CODEC.fieldOf("hash").forGetter(PasswordEntry::hash),
-            BYTE_ARR_CODEC.fieldOf("salt").forGetter(PasswordEntry::salt),
-            Codec.INT.fieldOf("iterations").forGetter(PasswordEntry::iterations),
-            Codec.STRING.fieldOf("algorithm").forGetter(PasswordEntry::algorithm)
-    ).apply(instance, PasswordEntry::new));
+                    BYTE_ARR_CODEC.fieldOf("hash").forGetter(PasswordEntry::hash),
+                    BYTE_ARR_CODEC.fieldOf("salt").forGetter(PasswordEntry::salt),
+                    Codec.INT.fieldOf("iterations").forGetter(PasswordEntry::iterations),
+                    Codec.STRING.fieldOf("algorithm").forGetter(PasswordEntry::algorithm))
+            .apply(instance, PasswordEntry::new));
 
     public boolean matches(String password) {
         return Arrays.equals(hash, genHash(password, salt, iterations, hash.length * 8, algorithm));
@@ -29,7 +29,12 @@ public record PasswordEntry(byte[] hash, byte[] salt, int iterations, String alg
     }
 
     public static PasswordEntry of(String password, ModConfig config) {
-        return of(password, config.passwordHashLength, config.passwordSaltLength, config.passwordHashIterations, config.passwordHashAlgorithm);
+        return of(
+                password,
+                config.passwordHashLength,
+                config.passwordSaltLength,
+                config.passwordHashIterations,
+                config.passwordHashAlgorithm);
     }
 
     public static PasswordEntry of(String password, int hashLength, int saltLength, int iterations, String algorithm) {

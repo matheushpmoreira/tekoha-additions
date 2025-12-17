@@ -1,7 +1,7 @@
 package dev.arzcbnh.tekoha.mixin;
 
 import dev.arzcbnh.tekoha.TekohaAdditions;
-//import dev.arzcbnh.minecraft.auth.AuthHandler;
+// import dev.arzcbnh.minecraft.auth.AuthHandler;
 import dev.arzcbnh.tekoha.auth.AuthRequestCallback;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.common.ServerboundCustomClickActionPacket;
@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerCommonPacketListenerImpl.class)
 public abstract class ServerCommonPacketListenerImplMixin {
     @Inject(method = "handleCustomClickAction", at = @At("HEAD"))
-    private void handleCustomClickAction(ServerboundCustomClickActionPacket serverboundCustomClickActionPacket, CallbackInfo ci) {
+    private void handleCustomClickAction(
+            ServerboundCustomClickActionPacket serverboundCustomClickActionPacket, CallbackInfo ci) {
         if ((Object) this instanceof ServerGamePacketListenerImpl impl) {
             final var id = serverboundCustomClickActionPacket.id();
             final var payload = serverboundCustomClickActionPacket.payload();
@@ -27,11 +28,23 @@ public abstract class ServerCommonPacketListenerImplMixin {
 
             switch (id.getPath()) {
                 case "auth/login": {
-                    AuthRequestCallback.LOGIN.invoker().offer(player, payload.flatMap(Tag::asCompound).flatMap(tag -> tag.getString("password")).orElse(""));
+                    AuthRequestCallback.LOGIN
+                            .invoker()
+                            .offer(
+                                    player,
+                                    payload.flatMap(Tag::asCompound)
+                                            .flatMap(tag -> tag.getString("password"))
+                                            .orElse(""));
                     break;
                 }
                 case "auth/signup": {
-                    AuthRequestCallback.SIGNUP.invoker().offer(player, payload.flatMap(Tag::asCompound).flatMap(tag -> tag.getString("password")).orElse(""));
+                    AuthRequestCallback.SIGNUP
+                            .invoker()
+                            .offer(
+                                    player,
+                                    payload.flatMap(Tag::asCompound)
+                                            .flatMap(tag -> tag.getString("password"))
+                                            .orElse(""));
                     break;
                 }
             }

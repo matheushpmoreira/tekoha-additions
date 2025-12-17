@@ -1,158 +1,124 @@
 package dev.arzcbnh.minecraft.auth;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.serialization.JsonOps;
 import dev.arzcbnh.minecraft.TekohaAdditions;
 import dev.arzcbnh.minecraft.data.PlayerData;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.server.MinecraftServer;
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.CommonColors;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
 
 public class ChatAuthService implements AuthService {
-    // TODO: I would love if I could store text components in language files. I tried looking into how SNBT is parsed
-    // into text components, but it threw me for a loop. I know I don't have much knowledge, but the Minecraft codebase
-    // has to be objectively spaghetti. I'll keep it like this for now, I don't even intend to use the chat service for
-    // long; and it works well enough.
-    private final Component CONFLICT = composeComponent("conflict", "login");
-    private final Component INVALID =  composeComponent("invalid", null);
-    private final Component LOGIN = composeComponent("login", "login");
-    private final Component MISSING = composeComponent("missing", "signup");
-    private final Component SIGNUP = composeComponent("signup", "signup");
-    private final Component SUCCESS = composeComponent("success", null);
-    private final Component WRONG =  composeComponent("wrong", null);
-
-    private static Component composeComponent(String translationKey, String command) {
-        if (command == null) {
-            return Component.translatable("tekoha.auth.chat." + translationKey).withColor(CommonColors.GRAY);
-        } else {
-            final var clickEvent = new ClickEvent.SuggestCommand("/" + command + " ");
-            final var insert = Component.literal("/" + command)
-                    .withColor(CommonColors.WHITE)
-                    .withStyle(Style.EMPTY.withUnderlined(true).withClickEvent(clickEvent));
-
-            return Component.translatable("tekoha.auth.chat." + translationKey, insert).withColor(CommonColors.GRAY);
-        }
-    }
-
     @Override
-    public void enterAuthState(ServerPlayer player) {
-        AuthService.super.enterAuthState(player);
+    public int beginAuth(ServerPlayer player) {
         final var data = PlayerData.of(player);
 
-        if (data.getPassword().isPresent()) {
-            player.sendSystemMessage(LOGIN);
-        } else {
-            player.sendSystemMessage(SIGNUP);
+        if (data.getDefaultGameType().isEmpty()) {
+            data.setDefaultGameType(player.gameMode());
         }
+
+        // FIXME: I know this doesn't prevent all player interactions, but it's enough for now.
+        player.setGameMode(GameType.SPECTATOR);
+
+        // Mounts the player on a fake invisible entity to prevent movement. The entity ID used is -1; I think Minecraft
+        // only uses non-negative integers so it never conflicts. The passenger packet has to be decoded from a byte
+        // buffer, since the entity is fake. The buffer has three four-byte integers: the vehicle ID, the passenger
+        // array length, and the passengers ID, of which there's always one. I picked a chicken because a player keeps
+        // the same eye level when mounting it, but unfortunately I wasn't able to make it invisible, nor able to hide
+        // the "vehicle hearts". That must do for now.
+        player.connection.send(new ClientboundAddEntityPacket(-1, UUID.randomUUID(), player.getX(), player.getY(), player.getZ(), player.getXRot(), player.getYRot(), EntityType.CHICKEN, 0, Vec3.ZERO, player.getYHeadRot()));
+        player.connection.send(ClientboundSetPassengersPacket.STREAM_CODEC.decode(new FriendlyByteBuf(Unpooled.buffer(12)).writeVarInt(-1).writeVarInt(1).writeVarInt(player.getId())));
+
+        return 1;
     }
 
     @Override
-    public void exitAuthState(ServerPlayer player) {
-        AuthService.super.exitAuthState(player);
-        player.sendSystemMessage(SUCCESS);
+    public int leaveAuth(ServerPlayer player) {
+        final var data =  PlayerData.of(player);
+        data.getDefaultGameType().ifPresent(player::setGameMode);
+        data.setDefaultGameType(null);
+
+        player.connection.send(new ClientboundRemoveEntitiesPacket(-1));
+        return 1;
     }
 
     @Override
-    public void handleLoginRequest(ServerPlayer player, String password) {
+    public int handleLoginRequest(ServerPlayer player, String password) {
         final var entry = PlayerData.of(player).getPassword();
 
         if (entry.isEmpty()) {
-            player.sendSystemMessage(MISSING);
+            return AuthResponse.NotFound;
         } else if (!entry.get().matches(password)) {
-            player.sendSystemMessage(WRONG);
+            return AuthResponse.Unauthorized;
         } else {
-            exitAuthState(player);
+            beginAuth(player);
+            return AuthResponse.OK;
         }
+
+        return 1;
     }
 
     @Override
-    public void handleSignupRequest(ServerPlayer player, String password) {
+    public int handleSignupRequest(ServerPlayer player, String password) {
         final var data = PlayerData.of(player);
 
         if (data.getPassword().isPresent()) {
-            player.sendSystemMessage(CONFLICT);
-        } else if (TekohaAdditions.CONFIG.passwordMinLength > password.length() || password.length() > TekohaAdditions.CONFIG.passwordMaxLength) {
-            player.sendSystemMessage(INVALID);
+            return AuthResponse.Conflict;
+        } else if (isPasswordInvalid(password)) {
+            return AuthResponse.UnprocessableEntity;
         } else {
+            unfreezePlayer(player);
             data.setPassword(password);
-            exitAuthState(player);
+            return AuthResponse.OK;
         }
     }
 
     @Override
-    public void handlePasswordChangeRequest(ServerPlayer player, String oldPassword, String newPassword) {
+    public int handlePasswordChangeRequest(ServerPlayer player, String oldPassword, String newPassword) {
         final var data = PlayerData.of(player);
         final var entry = data.getPassword();
 
         if (entry.isEmpty()) {
-            player.sendSystemMessage(MISSING);
+            return AuthResponse.NotFound;
         } else if (!entry.get().matches(oldPassword)) {
-            player.sendSystemMessage(WRONG);
-        } else if (TekohaAdditions.CONFIG.passwordMinLength > newPassword.length() || newPassword.length() > TekohaAdditions.CONFIG.passwordMaxLength) {
-            player.sendSystemMessage(INVALID);
+            return AuthResponse.Unauthorized;
+        } else if (isPasswordInvalid(newPassword)) {
+            return AuthResponse.UnprocessableEntity;
         } else {
             data.setPassword(newPassword);
+            return AuthResponse.OK;
         }
     }
 
     @Override
-    public void handleDeleteRequest(ServerPlayer player, String password) {
+    public int handleDeleteRequest(ServerPlayer player, String password) {
         final var data = PlayerData.of(player);
         final var entry = data.getPassword();
 
         if (entry.isEmpty()) {
-            player.sendSystemMessage(MISSING);
+            return AuthResponse.NotFound;
         } else if (!entry.get().matches(password)) {
-            player.sendSystemMessage(WRONG);
+            return AuthResponse.Unauthorized;
         } else {
             data.setPassword(null);
+            return AuthResponse.OK;
         }
     }
 
     @Override
-    public void init() {
-        AuthService.super.init();
+    public void deletePlayerPassword(ServerPlayer player) {
+        final var data = PlayerData.of(player);
+        data.setPassword(null);
+    }
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> {
-            dispatcher.register(Commands.literal("login")
-                    .then(Commands.argument("password", StringArgumentType.greedyString())
-                            .executes(ctx -> {
-                                this.handleLoginRequest(ctx.getSource().getPlayer(), ctx.getArgument("password", String.class));
-                                return 0;
-                            }).requires(CommandSourceStack::isPlayer)));
-
-            dispatcher.register(Commands.literal("signup")
-                    .then(Commands.argument("password", StringArgumentType.greedyString())
-                            .executes(ctx -> {
-                                this.handleSignupRequest(ctx.getSource().getPlayer(), ctx.getArgument("password", String.class));
-                                return 0;
-                            }).requires(CommandSourceStack::isPlayer)));
-//
-//            dispatcher.register(Commands.literal("changePassword")
-//                    .then(Commands.argument("password", StringArgumentType.greedyString())
-//                            .executes(ctx -> {
-//                                this.handleSignupRequest(ctx.getSource().getPlayer(), ctx.getArgument("password", String.class));
-//                                return 0;
-//                            }).requires(CommandSourceStack::isPlayer)));
-//
-//            dispatcher.register(Commands.literal("deletePassword")
-//                    .then(Commands.argument("password", StringArgumentType.greedyString())
-//                            .executes(ctx -> {
-//                                this.handleSignupRequest(ctx.getSource().getPlayer(), ctx.getArgument("password", String.class));
-//                                return 0;
-//                            }).requires(CommandSourceStack::isPlayer)));
-        });
+    public boolean isPasswordInvalid(String password) {
+        return TekohaAdditions.CONFIG.passwordMinLength > password.length() ||
+                password.length() > TekohaAdditions.CONFIG.passwordMaxLength;
     }
 }

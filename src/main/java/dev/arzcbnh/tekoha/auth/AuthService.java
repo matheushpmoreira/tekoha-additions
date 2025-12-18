@@ -1,18 +1,38 @@
 package dev.arzcbnh.tekoha.auth;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface AuthService {
-    // TODO: Maybe drop these integers. They're only useful for running commands.
-    int beginAuth(ServerPlayer player);
+    Codec<AuthService> CODEC = Codec.STRING.xmap(AuthService::fromType, AuthService::toType);
 
-    int endAuth(ServerPlayer player);
+    static String toType(AuthService service) {
+        return switch (service) {
+            case ChatAuthService ignored -> "chat";
+            case null, default -> throw new RuntimeException("Unknown AuthService instance: " + service);
+        };
+    }
 
-    int handleLoginRequest(ServerPlayer player, String password);
+    static AuthService fromType(String str) {
+        return switch (str) {
+            case "chat" -> ChatAuthService.getInstance();
+            case null, default -> throw new RuntimeException("Unknown AuthService type: " + str);
+        };
+    }
 
-    int handleSignupRequest(ServerPlayer player, String password);
+    void handleAllow(ServerPlayer player);
 
-    int handleUpdateRequest(ServerPlayer player, String oldPassword, String newPassword);
+    void handleConflict(ServerPlayer player);
 
-    int handleDeleteRequest(ServerPlayer player, String password);
+    void handleForbid(ServerPlayer player);
+
+    void handleNotFound(ServerPlayer player);
+
+    void handleSuccess(ServerPlayer player);
+
+    void handleUnauthorized(ServerPlayer player);
+
+    void handleUnprocessable(ServerPlayer player);
+
+    void handleUpdate(ServerPlayer player);
 }

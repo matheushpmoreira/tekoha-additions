@@ -1,6 +1,5 @@
 {
   "tekoha.auth.chat.conflict": "User already registered. Use %s to authenticate.",
-  "tekoha.auth.chat.delete": "Password deleted. Use %s to register again.",
   "tekoha.auth.chat.notfound": "User not found. Use %s to register.",
   "tekoha.auth.chat.success": "Authentication successful!",
   "tekoha.auth.chat.unauthorized": "Wrong password. If you need help, contact an administrator.",

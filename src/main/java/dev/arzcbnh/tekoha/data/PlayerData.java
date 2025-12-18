@@ -3,6 +3,7 @@ package dev.arzcbnh.tekoha.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.arzcbnh.tekoha.TekohaAdditions;
+import dev.arzcbnh.tekoha.auth.AuthService;
 import dev.arzcbnh.tekoha.auth.PasswordEntry;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,24 +18,42 @@ public class PlayerData extends SavedData {
     public final ServerPlayer player;
     private PasswordEntry password;
     private GameType defaultGameType;
+    private AuthService authService;
 
-    private PlayerData(ServerPlayer player, @Nullable PasswordEntry password, @Nullable GameType defaultGameType) {
+    private PlayerData(
+            ServerPlayer player,
+            @Nullable PasswordEntry password,
+            @Nullable GameType gametype,
+            @Nullable AuthService service) {
         this.player = player;
         this.password = password;
-        this.defaultGameType = defaultGameType;
+        this.defaultGameType = gametype;
+        this.authService = service;
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private PlayerData(
+            ServerPlayer player,
+            Optional<PasswordEntry> password,
+            Optional<GameType> gametype,
+            Optional<AuthService> service) {
+        this(player, password.orElse(null), gametype.orElse(null), service.orElse(null));
+    }
+
+    private PlayerData(ServerPlayer player) {
+        this.player = player;
     }
 
     public static PlayerData of(ServerPlayer player) {
         final Codec<PlayerData> codec = RecordCodecBuilder.create(instance -> instance.group(
                         PasswordEntry.CODEC.optionalFieldOf("password").forGetter(PlayerData::getPassword),
-                        GameType.CODEC.optionalFieldOf("defaultGameType").forGetter(PlayerData::getDefaultGameType))
-                .apply(
-                        instance,
-                        (password, gametype) -> new PlayerData(player, password.orElse(null), gametype.orElse(null))));
+                        GameType.CODEC.optionalFieldOf("gametype").forGetter(PlayerData::getDefaultGameType),
+                        AuthService.CODEC.optionalFieldOf("service").forGetter(PlayerData::getAuthService))
+                .apply(instance, (password, gametype, service) -> new PlayerData(player, password, gametype, service)));
 
         final SavedDataType<PlayerData> type = new SavedDataType<>(
-                String.format("%s-player-%s", TekohaAdditions.MOD_ID, player.getUUID()),
-                () -> new PlayerData(player, null, null),
+                "%s-player-%s".formatted(TekohaAdditions.MOD_ID, player.getUUID()),
+                () -> new PlayerData(player),
                 codec,
                 null);
 
@@ -59,6 +78,14 @@ public class PlayerData extends SavedData {
     public void setDefaultGameType(@Nullable GameType defaultGameType) {
         this.defaultGameType = defaultGameType;
         this.setDirty();
+    }
+
+    public Optional<AuthService> getAuthService() {
+        return Optional.ofNullable(authService);
+    }
+
+    public void setAuthService(@Nullable AuthService service) {
+        this.authService = service;
     }
 
     public boolean isAuthenticated() {

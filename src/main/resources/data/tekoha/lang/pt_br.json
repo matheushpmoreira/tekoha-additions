@@ -1,6 +1,5 @@
 {
   "tekoha.auth.chat.conflict": "Usuário já cadastrado. Utilize %s para autenticar-se.",
-  "tekoha.auth.chat.delete": "Senha excluída. Use %s para se registrar novamente.",
   "tekoha.auth.chat.notfound": "Usuário não encontrado. Utilize %s para cadastrar-se.",
   "tekoha.auth.chat.success": "Autenticação realizada com sucesso!",
   "tekoha.auth.chat.unauthorized": "Senha incorreta. Caso precise de ajuda, contate um administrador.",

@@ -1,7 +1,6 @@
 package dev.arzcbnh.tekoha;
 
 import dev.arzcbnh.tekoha.auth.*;
-import dev.arzcbnh.tekoha.command.TekohaCommands;
 import dev.arzcbnh.tekoha.util.ModConfig;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -14,8 +13,6 @@ public class TekohaAdditions implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        final var auth = new ChatAuthService();
-        TekohaCommands.init(auth);
-        auth.init();
+        new Auth().init();
     }
 }

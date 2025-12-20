@@ -1,6 +1,7 @@
 package dev.arzcbnh.tekoha;
 
 import dev.arzcbnh.tekoha.auth.*;
+import dev.arzcbnh.tekoha.misc.ArmorCommands;
 import dev.arzcbnh.tekoha.util.ModConfig;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -14,5 +15,6 @@ public class TekohaAdditions implements ModInitializer {
     @Override
     public void onInitialize() {
         new Auth().init();
+        ArmorCommands.init();
     }
 }

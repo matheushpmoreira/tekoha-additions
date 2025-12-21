@@ -3,6 +3,9 @@ package dev.arzcbnh.tekoha.misc;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import dev.arzcbnh.tekoha.data.PlayerData;
+import dev.arzcbnh.tekoha.mixin.LivingEntityAccessor;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
@@ -37,28 +40,36 @@ public class ArmorCommands {
     private static int setHeadVisibility(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var hidden = BoolArgumentType.getBool(context, "hidden");
+        final var map = new HashMap<>(Map.of(EquipmentSlot.HEAD, player.getItemBySlot(EquipmentSlot.HEAD)));
         setEquipmentHidden(player, EquipmentSlot.HEAD, hidden);
+        ((LivingEntityAccessor) player).tekoha$handleEquipmentChanges(map);
         return 1;
     }
 
     private static int setChestVisibility(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var hidden = BoolArgumentType.getBool(context, "hidden");
+        final var map = new HashMap<>(Map.of(EquipmentSlot.CHEST, player.getItemBySlot(EquipmentSlot.CHEST)));
         setEquipmentHidden(player, EquipmentSlot.CHEST, hidden);
+        ((LivingEntityAccessor) player).tekoha$handleEquipmentChanges(map);
         return 1;
     }
 
     private static int setLegsVisibility(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var hidden = BoolArgumentType.getBool(context, "hidden");
+        final var map = new HashMap<>(Map.of(EquipmentSlot.LEGS, player.getItemBySlot(EquipmentSlot.LEGS)));
         setEquipmentHidden(player, EquipmentSlot.LEGS, hidden);
+        ((LivingEntityAccessor) player).tekoha$handleEquipmentChanges(map);
         return 1;
     }
 
     private static int setFeetVisibility(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var hidden = BoolArgumentType.getBool(context, "hidden");
+        final var map = new HashMap<>(Map.of(EquipmentSlot.FEET, player.getItemBySlot(EquipmentSlot.FEET)));
         setEquipmentHidden(player, EquipmentSlot.FEET, hidden);
+        ((LivingEntityAccessor) player).tekoha$handleEquipmentChanges(map);
         return 1;
     }
 

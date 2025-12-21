@@ -1,0 +1,281 @@
+{
+  "name": {
+    "translate": "tekoha.menu.armor.title"
+  },
+  "items": [
+    {
+      "type": "item",
+      "slot": [
+        1,
+        1
+      ],
+      "item": {
+        "id": "minecraft:golden_helmet",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.menu.armor.head",
+            "italic": false
+          }
+        }
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        1,
+        2
+      ],
+      "item": {
+        "id": "minecraft:golden_chestplate",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.menu.armor.chest",
+            "italic": false
+          }
+        }
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        1,
+        3
+      ],
+      "item": {
+        "id": "minecraft:golden_leggings",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.menu.armor.legs",
+            "italic": false
+          }
+        }
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        1,
+        4
+      ],
+      "item": {
+        "id": "minecraft:golden_boots",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.menu.armor.feet",
+            "italic": false
+          }
+        }
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        2,
+        1
+      ],
+      "item": {
+        "id": "minecraft:lime_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.show",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor head false",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        2,
+        2
+      ],
+      "item": {
+        "id": "minecraft:lime_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.show",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor chest false",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        2,
+        3
+      ],
+      "item": {
+        "id": "minecraft:lime_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.show",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor legs false",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        2,
+        4
+      ],
+      "item": {
+        "id": "minecraft:lime_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.show",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor feet false",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        3,
+        1
+      ],
+      "item": {
+        "id": "minecraft:red_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.hide",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor head true",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        3,
+        2
+      ],
+      "item": {
+        "id": "minecraft:red_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.hide",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor chest true",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        3,
+        3
+      ],
+      "item": {
+        "id": "minecraft:red_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.hide",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor legs true",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        3,
+        4
+      ],
+      "item": {
+        "id": "minecraft:red_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.hide",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor feet true",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        2,
+        6
+      ],
+      "item": {
+        "id": "minecraft:lime_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.show_all",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor all false",
+        "as_player": true
+      }
+    },
+    {
+      "type": "item",
+      "slot": [
+        2,
+        8
+      ],
+      "item": {
+        "id": "minecraft:red_concrete",
+        "components": {
+          "custom_name": {
+            "translate": "tekoha.armor.menu.hide_all",
+            "italic": false
+          }
+        }
+      },
+      "action": {
+        "type": "command",
+        "command": "tekoha armor all true",
+        "as_player": true
+      }
+    }
+  ]
+}

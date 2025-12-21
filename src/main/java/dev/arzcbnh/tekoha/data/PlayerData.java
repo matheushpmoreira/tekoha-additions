@@ -3,7 +3,6 @@ package dev.arzcbnh.tekoha.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.arzcbnh.tekoha.TekohaAdditions;
-import dev.arzcbnh.tekoha.auth.AuthService;
 import dev.arzcbnh.tekoha.auth.PasswordEntry;
 import java.util.*;
 import net.minecraft.server.level.ServerLevel;
@@ -18,19 +17,16 @@ public class PlayerData extends SavedData {
     public final ServerPlayer player;
     private PasswordEntry password;
     private GameType defaultGameType;
-    private AuthService authService;
     private final Set<EquipmentSlot> hiddenEquipment;
 
     private PlayerData(
             ServerPlayer player,
             @Nullable PasswordEntry password,
             @Nullable GameType gametype,
-            @Nullable AuthService service,
             Set<EquipmentSlot> hiddenEquipment) {
         this.player = player;
         this.password = password;
         this.defaultGameType = gametype;
-        this.authService = service;
         this.hiddenEquipment = hiddenEquipment;
     }
 
@@ -39,14 +35,8 @@ public class PlayerData extends SavedData {
             ServerPlayer player,
             Optional<PasswordEntry> password,
             Optional<GameType> gametype,
-            Optional<AuthService> service,
             List<EquipmentSlot> hiddenEquipment) {
-        this(
-                player,
-                password.orElse(null),
-                gametype.orElse(null),
-                service.orElse(null),
-                new HashSet<>(hiddenEquipment));
+        this(player, password.orElse(null), gametype.orElse(null), new HashSet<>(hiddenEquipment));
     }
 
     private PlayerData(ServerPlayer player) {
@@ -58,15 +48,13 @@ public class PlayerData extends SavedData {
         final Codec<PlayerData> codec = RecordCodecBuilder.create(instance -> instance.group(
                         PasswordEntry.CODEC.optionalFieldOf("password").forGetter(PlayerData::getPassword),
                         GameType.CODEC.optionalFieldOf("gametype").forGetter(PlayerData::getDefaultGameType),
-                        AuthService.CODEC.optionalFieldOf("service").forGetter(PlayerData::getAuthService),
                         EquipmentSlot.CODEC
                                 .listOf()
                                 .fieldOf("hiddenEquipment")
                                 .forGetter(obj -> obj.hiddenEquipment.stream().toList()))
                 .apply(
                         instance,
-                        (password, gametype, service, equipment) ->
-                                new PlayerData(player, password, gametype, service, equipment)));
+                        (password, gametype, equipment) -> new PlayerData(player, password, gametype, equipment)));
 
         final SavedDataType<PlayerData> type = new SavedDataType<>(
                 "%s-player-%s".formatted(TekohaAdditions.MOD_ID, player.getUUID()),
@@ -95,14 +83,6 @@ public class PlayerData extends SavedData {
     public void setDefaultGameType(@Nullable GameType defaultGameType) {
         this.defaultGameType = defaultGameType;
         this.setDirty();
-    }
-
-    public Optional<AuthService> getAuthService() {
-        return Optional.ofNullable(authService);
-    }
-
-    public void setAuthService(@Nullable AuthService service) {
-        this.authService = service;
     }
 
     public boolean isEquipmentHidden(EquipmentSlot slot) {

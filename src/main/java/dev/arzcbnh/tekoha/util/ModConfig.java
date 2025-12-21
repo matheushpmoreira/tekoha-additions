@@ -8,7 +8,6 @@ import java.util.Properties;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class ModConfig {
-    public final String defaultAuthService;
     public final String passwordHashAlgorithm;
     public final int passwordHashIterations;
     public final int passwordHashLength;
@@ -17,7 +16,6 @@ public class ModConfig {
     public final int passwordMinLength;
 
     public ModConfig(Properties props) {
-        this.defaultAuthService = props.getProperty("defaultAuthService", "chat");
         this.passwordHashAlgorithm = props.getProperty("passwordHashAlgorithm", "PBKDF2WithHmacSHA256");
         this.passwordHashIterations = Integer.parseInt(props.getProperty("passwordHashIterations", "100000"));
         this.passwordHashLength = Integer.parseInt(props.getProperty("passwordHashLength", "256"));

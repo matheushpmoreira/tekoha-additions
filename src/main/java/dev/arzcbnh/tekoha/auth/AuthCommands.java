@@ -8,7 +8,6 @@ import dev.arzcbnh.tekoha.data.PlayerData;
 import io.netty.buffer.Unpooled;
 import java.util.Objects;
 import java.util.UUID;
-
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -31,19 +30,11 @@ public class AuthCommands {
                             .then(Commands.argument("password", StringArgumentType.greedyString())
                                     .requires(CommandSourceStack::isPlayer)
                                     .executes(AuthCommands::handleLogin)))
-                    .then(Commands.literal("signup")
-                            .then(Commands.argument("password", StringArgumentType.greedyString())
-                                    .requires(CommandSourceStack::isPlayer)
-                                    .executes(AuthCommands::handleSignup)))
                     .then(Commands.literal("auth")
                             .then(Commands.literal("login")
                                     .then(Commands.argument("password", StringArgumentType.greedyString())
                                             .requires(CommandSourceStack::isPlayer)
                                             .executes(AuthCommands::handleLogin)))
-                            .then(Commands.literal("signup")
-                                    .then(Commands.argument("password", StringArgumentType.greedyString())
-                                            .requires(CommandSourceStack::isPlayer)
-                                            .executes(AuthCommands::handleSignup)))
                             .then(Commands.literal("update")
                                     .then(Commands.argument("old-password", StringArgumentType.string())
                                             .then(Commands.argument("new-password", StringArgumentType.string())
@@ -111,35 +102,20 @@ public class AuthCommands {
         if (data.isAuthenticated()) {
             return 0;
         } else if (entry.isEmpty()) {
-            service.handleNotFound(player);
-            return 0;
+            if (isPasswordInvalid(password)) {
+                service.handleUnprocessable(player);
+                return 0;
+            } else {
+                service.handleSuccess(player);
+                data.setPassword(password);
+                allowPlayer(player);
+                return 1;
+            }
         } else if (!entry.get().matches(password)) {
             service.handleUnauthorized(player);
             return 0;
         } else {
             service.handleSuccess(player);
-            allowPlayer(player);
-            return 1;
-        }
-    }
-
-    public static int handleSignup(CommandContext<CommandSourceStack> context) {
-        final var player = Objects.requireNonNull(context.getSource().getPlayer());
-        final var password = context.getArgument("password", String.class);
-        final var data = PlayerData.of(player);
-        final var service = ChatAuthService.getInstance();
-
-        if (data.isAuthenticated()) {
-            return 0;
-        } else if (data.getPassword().isPresent()) {
-            service.handleConflict(player);
-            return 0;
-        } else if (isPasswordInvalid(password)) {
-            service.handleUnprocessable(player);
-            return 0;
-        } else {
-            service.handleSuccess(player);
-            data.setPassword(password);
             allowPlayer(player);
             return 1;
         }

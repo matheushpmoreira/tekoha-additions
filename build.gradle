@@ -27,14 +27,6 @@ fabricApi {
     configureDataGeneration {
         client = true
     }
-
-    configureTests {
-        createSourceSet = true
-        modId = "example-mod-test-${project.name}"
-        enableGameTests = true
-        enableClientGameTests = true
-        eula = true
-    }
 }
 
 repositories {
@@ -113,10 +105,6 @@ publishing {
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
     }
-}
-
-test {
-    useJUnitPlatform()
 }
 
 spotless {

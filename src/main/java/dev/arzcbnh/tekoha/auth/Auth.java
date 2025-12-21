@@ -8,6 +8,6 @@ public class Auth {
         AuthCommands.init();
 
         ServerLifecycleEvents.SERVER_STARTED.register(
-                server -> ServerPlayerEvents.JOIN.register(AuthCommands::forbidPlayer));
+                server -> ServerPlayerEvents.JOIN.register(AuthCommands::disablePlayerInteraction));
     }
 }

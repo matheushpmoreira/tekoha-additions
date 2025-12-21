@@ -33,7 +33,11 @@ public class ArmorCommands {
                             .then(Commands.literal("feet")
                                     .then(Commands.argument("hidden", BoolArgumentType.bool())
                                             .requires(CommandSourceStack::isPlayer)
-                                            .executes(ArmorCommands::setFeetVisibility)))));
+                                            .executes(ArmorCommands::setFeetVisibility)))
+                            .then(Commands.literal("all")
+                                    .then(Commands.argument("hidden", BoolArgumentType.bool())
+                                            .requires(CommandSourceStack::isPlayer)
+                                            .executes(ArmorCommands::setAllVisibility)))));
         });
     }
 
@@ -68,6 +72,26 @@ public class ArmorCommands {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var hidden = BoolArgumentType.getBool(context, "hidden");
         final var map = new HashMap<>(Map.of(EquipmentSlot.FEET, player.getItemBySlot(EquipmentSlot.FEET)));
+        setEquipmentHidden(player, EquipmentSlot.FEET, hidden);
+        ((LivingEntityAccessor) player).tekoha$handleEquipmentChanges(map);
+        return 1;
+    }
+
+    private static int setAllVisibility(CommandContext<CommandSourceStack> context) {
+        final var player = Objects.requireNonNull(context.getSource().getPlayer());
+        final var hidden = BoolArgumentType.getBool(context, "hidden");
+        final var map = new HashMap<>(Map.of(
+                EquipmentSlot.HEAD,
+                player.getItemBySlot(EquipmentSlot.HEAD),
+                EquipmentSlot.CHEST,
+                player.getItemBySlot(EquipmentSlot.CHEST),
+                EquipmentSlot.LEGS,
+                player.getItemBySlot(EquipmentSlot.LEGS),
+                EquipmentSlot.FEET,
+                player.getItemBySlot(EquipmentSlot.FEET)));
+        setEquipmentHidden(player, EquipmentSlot.HEAD, hidden);
+        setEquipmentHidden(player, EquipmentSlot.CHEST, hidden);
+        setEquipmentHidden(player, EquipmentSlot.LEGS, hidden);
         setEquipmentHidden(player, EquipmentSlot.FEET, hidden);
         ((LivingEntityAccessor) player).tekoha$handleEquipmentChanges(map);
         return 1;

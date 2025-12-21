@@ -1,6 +1,6 @@
 {
   "name": {
-    "translate": "tekoha.menu.armor.title"
+    "translate": "tekoha.armor.menu.title"
   },
   "items": [
     {
@@ -12,8 +12,9 @@
       "item": {
         "id": "minecraft:golden_helmet",
         "components": {
+          "attribute_modifiers": [],
           "custom_name": {
-            "translate": "tekoha.menu.armor.head",
+            "translate": "tekoha.armor.menu.head",
             "italic": false
           }
         }
@@ -28,8 +29,9 @@
       "item": {
         "id": "minecraft:golden_chestplate",
         "components": {
+          "attribute_modifiers": [],
           "custom_name": {
-            "translate": "tekoha.menu.armor.chest",
+            "translate": "tekoha.armor.menu.chest",
             "italic": false
           }
         }
@@ -44,8 +46,9 @@
       "item": {
         "id": "minecraft:golden_leggings",
         "components": {
+          "attribute_modifiers": [],
           "custom_name": {
-            "translate": "tekoha.menu.armor.legs",
+            "translate": "tekoha.armor.menu.legs",
             "italic": false
           }
         }
@@ -60,8 +63,9 @@
       "item": {
         "id": "minecraft:golden_boots",
         "components": {
+          "attribute_modifiers": [],
           "custom_name": {
-            "translate": "tekoha.menu.armor.feet",
+            "translate": "tekoha.armor.menu.feet",
             "italic": false
           }
         }

@@ -14,7 +14,7 @@ public class TekohaAdditions implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        new Auth().init();
+        AuthCommands.init();
         ArmorCommands.init();
     }
 }

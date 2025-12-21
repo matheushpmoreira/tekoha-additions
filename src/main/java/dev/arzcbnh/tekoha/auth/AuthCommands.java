@@ -1,13 +1,17 @@
 package dev.arzcbnh.tekoha.auth;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.arzcbnh.tekoha.TekohaAdditions;
 import dev.arzcbnh.tekoha.data.PlayerData;
-import dev.arzcbnh.tekoha.util.ModConfig;
 import io.netty.buffer.Unpooled;
 import java.util.Objects;
 import java.util.UUID;
+
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -20,19 +24,42 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
 public class AuthCommands {
-    private final int passwordMinLength;
-    private final int passwordMaxLength;
-    private final AuthService defaultService;
-
-    public AuthCommands(ModConfig config) {
-        this.passwordMinLength = config.passwordMinLength;
-        this.passwordMaxLength = config.passwordMaxLength;
-        this.defaultService = AuthService.fromType(config.defaultAuthService);
+    public static void init() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, build, selection) -> {
+            dispatcher.register(Commands.literal("tekoha")
+                    .then(Commands.literal("login")
+                            .then(Commands.argument("password", StringArgumentType.greedyString())
+                                    .requires(CommandSourceStack::isPlayer)
+                                    .executes(AuthCommands::handleLogin)))
+                    .then(Commands.literal("signup")
+                            .then(Commands.argument("password", StringArgumentType.greedyString())
+                                    .requires(CommandSourceStack::isPlayer)
+                                    .executes(AuthCommands::handleSignup)))
+                    .then(Commands.literal("auth")
+                            .then(Commands.literal("login")
+                                    .then(Commands.argument("password", StringArgumentType.greedyString())
+                                            .requires(CommandSourceStack::isPlayer)
+                                            .executes(AuthCommands::handleLogin)))
+                            .then(Commands.literal("signup")
+                                    .then(Commands.argument("password", StringArgumentType.greedyString())
+                                            .requires(CommandSourceStack::isPlayer)
+                                            .executes(AuthCommands::handleSignup)))
+                            .then(Commands.literal("update")
+                                    .then(Commands.argument("old-password", StringArgumentType.string())
+                                            .then(Commands.argument("new-password", StringArgumentType.string())
+                                                    .requires(CommandSourceStack::isPlayer)
+                                                    .executes(AuthCommands::handleUpdate))))
+                            .then(Commands.literal("delete")
+                                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                    .then(Commands.argument("player", EntityArgument.player())
+                                            .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                            .executes(AuthCommands::handleDelete)))));
+        });
     }
 
-    public void allowPlayer(ServerPlayer player) {
+    public static void allowPlayer(ServerPlayer player) {
         final var data = PlayerData.of(player);
-        final var service = data.getAuthService().orElse(this.defaultService);
+        final var service = ChatAuthService.getInstance();
 
         data.getDefaultGameType().ifPresent(player::setGameMode);
         data.setDefaultGameType(null);
@@ -42,9 +69,9 @@ public class AuthCommands {
     }
 
     // FIXME: Not enough to prevent a player from interacting with the server.
-    public void forbidPlayer(ServerPlayer player) {
+    public static void forbidPlayer(ServerPlayer player) {
         final var data = PlayerData.of(player);
-        final var service = data.getAuthService().orElse(this.defaultService);
+        final var service = ChatAuthService.getInstance();
 
         if (data.getDefaultGameType().isEmpty()) {
             data.setDefaultGameType(player.gameMode());
@@ -74,12 +101,12 @@ public class AuthCommands {
         service.handleForbid(player);
     }
 
-    public int handleLogin(CommandContext<CommandSourceStack> context) {
+    public static int handleLogin(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var password = context.getArgument("password", String.class);
         final var data = PlayerData.of(player);
         final var entry = data.getPassword();
-        final var service = data.getAuthService().orElse(this.defaultService);
+        final var service = ChatAuthService.getInstance();
 
         if (data.isAuthenticated()) {
             return 0;
@@ -91,16 +118,16 @@ public class AuthCommands {
             return 0;
         } else {
             service.handleSuccess(player);
-            this.allowPlayer(player);
+            allowPlayer(player);
             return 1;
         }
     }
 
-    public int handleSignup(CommandContext<CommandSourceStack> context) {
+    public static int handleSignup(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var password = context.getArgument("password", String.class);
         final var data = PlayerData.of(player);
-        final var service = data.getAuthService().orElse(this.defaultService);
+        final var service = ChatAuthService.getInstance();
 
         if (data.isAuthenticated()) {
             return 0;
@@ -113,18 +140,18 @@ public class AuthCommands {
         } else {
             service.handleSuccess(player);
             data.setPassword(password);
-            this.allowPlayer(player);
+            allowPlayer(player);
             return 1;
         }
     }
 
-    public int handleUpdate(CommandContext<CommandSourceStack> context) {
+    public static int handleUpdate(CommandContext<CommandSourceStack> context) {
         final var player = Objects.requireNonNull(context.getSource().getPlayer());
         final var oldPassword = context.getArgument("old-password", String.class);
         final var newPassword = context.getArgument("new-password", String.class);
         final var data = PlayerData.of(player);
         final var entry = data.getPassword();
-        final var service = data.getAuthService().orElse(this.defaultService);
+        final var service = ChatAuthService.getInstance();
 
         if (entry.isEmpty()) {
             service.handleNotFound(player);
@@ -142,7 +169,7 @@ public class AuthCommands {
         }
     }
 
-    public int handleDelete(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public static int handleDelete(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         final var player = Objects.requireNonNull(EntityArgument.getPlayer(context, "player"));
         final var data = PlayerData.of(player);
 
@@ -153,7 +180,10 @@ public class AuthCommands {
         return 1;
     }
 
-    public boolean isPasswordInvalid(String password) {
-        return passwordMinLength > password.length() || password.length() > passwordMaxLength;
+    public static boolean isPasswordInvalid(String password) {
+        final var min = TekohaAdditions.CONFIG.passwordMinLength;
+        final var max = TekohaAdditions.CONFIG.passwordMaxLength;
+        final var len = password.length();
+        return min > len || len > max;
     }
 }

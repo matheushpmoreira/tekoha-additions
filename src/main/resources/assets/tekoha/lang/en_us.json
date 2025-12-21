@@ -6,7 +6,6 @@
   "tekoha.auth.chat.unprocessable": "The password must be between 6 and 64 characters long.",
   "tekoha.auth.chat.update": "Password updated successfully!",
   "tekoha.auth.chat.welcome": "Use %s to authenticate, or %s to register.",
-
   "tekoha.auth.dialog.title": "Authentication Form",
   "tekoha.auth.dialog.signup": "User not found. Create a new password to continue.",
   "tekoha.auth.dialog.login": "Type in your password to continue.",

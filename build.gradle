@@ -109,7 +109,7 @@ publishing {
 
 spotless {
     format 'misc', {
-        target '*.gradle', '.gitattributes', '.gitignore', '*.json', '*.properties'
+        target '*.gradle', '.gitattributes', '.gitignore', '*.properties'
 
         trimTrailingWhitespace()
         leadingTabsToSpaces()
@@ -119,5 +119,10 @@ spotless {
     java {
         palantirJavaFormat().formatJavadoc(true)
         formatAnnotations()
+    }
+
+    json {
+        target 'src/**/*.json'
+        gson().indentWithSpaces(2)
     }
 }
